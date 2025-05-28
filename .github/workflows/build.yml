@@ -1,0 +1,61 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [stable]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Build project
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+      - name: Run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --release
+
+      - name: Package binary (Unix-like)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p dist
+          cp target/release/treegen dist/
+          tar -czvf treegen-${{ runner.os }}.tar.gz dist/treegen
+
+      - name: Package binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir dist
+          Copy-Item target\release\treegen.exe dist\
+          Compress-Archive -Path dist\treegen.exe -DestinationPath treegen-${{ runner.os }}.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: treegen-${{ runner.os }}
+          path: |
+            treegen-${{ runner.os }}.tar.gz
+            treegen-${{ runner.os }}.zip
