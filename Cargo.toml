@@ -1,0 +1,11 @@
+[package]
+name = "treegen"
+version = "0.1.0"
+edition = "2021"
+authors = ["AnNingUI <3533581512@qq.com>"]
+description = "A CLI tool to generate file trees from Markdown/YAML/JSON definitions"
+license = "MIT"
+repository = "https://github.com/AnNingUI/treegen"
+
+
+[dependencies]
