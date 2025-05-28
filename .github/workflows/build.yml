@@ -53,7 +53,7 @@ jobs:
           Compress-Archive -Path dist\treegen.exe -DestinationPath treegen-${{ runner.os }}.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: treegen-${{ runner.os }}
           path: |
