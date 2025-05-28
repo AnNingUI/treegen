@@ -26,13 +26,14 @@ treegen tree.yaml --out output --verbose
 
 ## 树格式
 例如：
+```md
 project/
 ├── src/
 │   ├── main.rs
 │   └── lib.rs
 ├── Cargo.toml
 └── README.md
-
+```
 更多格式请查看example
 
 ## 命令参数说明

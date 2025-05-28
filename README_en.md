@@ -29,13 +29,14 @@ treegen tree.yaml --out output --verbose
 ```
 
 ## Tree Format
-Example:
+```md
 project/
 ├── src/
 │   ├── main.rs
 │   └── lib.rs
 ├── Cargo.toml
 └── README.md
+```
 
 ## Command Parameters
 - specification: One or more specification files (supports .md, .yaml, .yml, .json, .toml, .json5).
