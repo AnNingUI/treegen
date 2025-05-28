@@ -1,0 +1,24 @@
+[my_project_toml]
+"Cargo.toml" = """
+[package]
+name = "my_project_toml"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0"
+"""
+
+"README.md" = """
+# My Project
+
+This project was generated from a TOML definition.
+"""
+
+
+[my_project_toml.src]
+"main.rs" = """
+fn main() {
+    println!("Hello from TOML!");
+}
+"""
+"lib.rs" = ""

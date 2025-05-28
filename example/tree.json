@@ -1,0 +1,10 @@
+{
+	"my_project_json": {
+		"src": {
+			"main.rs": "fn main() {\n    println!(\"Hello from JSON!\");\n}",
+			"lib.rs": ""
+		},
+		"Cargo.toml": "[package]\nname = \"my_project_json\"\nversion = \"0.1.0\"\n\n[dependencies]\nserde = \"1.0\"\n",
+		"README.md": "# My Project\n\nThis project was generated from a JSON definition.\n"
+	}
+}

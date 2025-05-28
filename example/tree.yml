@@ -1,0 +1,18 @@
+my_project_yml:
+  src:
+    main.rs: |
+      fn main() {
+          println!("Hello from YML!");
+      }
+    lib.rs: ""
+  Cargo.toml: |
+    [package]
+    name = "my_project_yml"
+    version = "0.1.0"
+
+    [dependencies]
+    serde = "1.0"
+  README.md: |
+    # My Project
+
+    This project was generated from a YML definition.

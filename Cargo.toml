@@ -9,3 +9,11 @@ repository = "https://github.com/AnNingUI/treegen"
 
 
 [dependencies]
+anyhow = "1.0.98"
+clap = { version = "4.5.39", features = ["derive"] }
+json5 = "0.4.1"
+regex = "1.11.1"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+serde_yaml = "0.9.34"
+toml = "0.5"                                           # 添加 toml crate 依赖

@@ -1,0 +1,11 @@
+// tree.json5
+{
+	my_project_json5: {
+		src: {
+			"main.rs": 'fn main() {\n    println!("Hello from JSON5!");\n}',
+			"lib.rs": "",
+		},
+		"Cargo.toml": '[package]\nname = "my_project_json5"\nversion = "0.1.0"\n',
+		"README.md": "# My Project\n\nThis project was generated from a JSON5 definition.\n",
+	},
+}
