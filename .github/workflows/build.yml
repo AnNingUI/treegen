@@ -14,48 +14,75 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        rust: [stable]
+        rust: [stable, 1.70.0]
+      fail-fast: false
+      max-parallel: 2
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ matrix.rust }}
-          override: true
+          components: rustfmt, clippy
+
+      - name: Rust Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-rust-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-${{ matrix.rust }}-
+            ${{ runner.os }}-rust-
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+        continue-on-error: true
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
+        continue-on-error: true
 
       - name: Build project
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
+        timeout-minutes: 20
+        if: always()
 
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release
+        run: cargo test --release
+        timeout-minutes: 30
+        if: success()
 
-      - name: Package binary (Unix-like)
-        if: runner.os != 'Windows'
-        run: |
-          mkdir -p dist
-          cp target/release/treegen dist/
-          tar -czvf treegen-${{ runner.os }}.tar.gz dist/treegen
+      - name: Create dist directory
+        run: mkdir -p dist
+        shell: bash
 
-      - name: Package binary (Windows)
-        if: runner.os == 'Windows'
+      - name: Package binary
+        shell: bash
         run: |
-          mkdir dist
-          Copy-Item target\release\treegen.exe dist\
-          Compress-Archive -Path dist\treegen.exe -DestinationPath treegen-${{ runner.os }}.zip
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            cp target/release/treegen.exe LICENSE README.md dist/
+            7z a "treegen-${RUNNER_OS}-${GITHUB_SHA}.zip" ./dist/*
+          else
+            cp target/release/treegen LICENSE README.md dist/
+            tar -czvf "treegen-${RUNNER_OS}-${GITHUB_SHA}.tar.gz" dist/
+          fi
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
+        if: success()
         with:
-          name: treegen-${{ runner.os }}
+          name: treegen-${{ runner.os }}-${{ github.sha }}
           path: |
-            treegen-${{ runner.os }}.tar.gz
-            treegen-${{ runner.os }}.zip
+            treegen-*.tar.gz
+            treegen-*.zip
+          retention-days: 5
