@@ -14,48 +14,56 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        rust: [stable]
+        rust: [stable, 1.70.0] # 添加最小支持版本
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+      - name: Install Rust toolchain
+        run: rustup update ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
+
+      - name: Rust Cache
+        uses: actions/cache@v3
         with:
-          toolchain: ${{ matrix.rust }}
-          override: true
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings
 
       - name: Build project
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
+        run: cargo build --release
 
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release
+        run: cargo test --release
 
       - name: Package binary (Unix-like)
         if: runner.os != 'Windows'
         run: |
           mkdir -p dist
-          cp target/release/treegen dist/
-          tar -czvf treegen-${{ runner.os }}.tar.gz dist/treegen
+          cp target/release/treegen LICENSE README.md dist/
+          tar -czvf "treegen-${{ runner.os }}-${{ github.sha }}.tar.gz" dist/
 
       - name: Package binary (Windows)
         if: runner.os == 'Windows'
         run: |
           mkdir dist
-          Copy-Item target\release\treegen.exe dist\
-          Compress-Archive -Path dist\treegen.exe -DestinationPath treegen-${{ runner.os }}.zip
+          Copy-Item target\release\treegen.exe LICENSE README.md dist\
+          Compress-Archive -Path dist\* -DestinationPath "treegen-${{ runner.os }}-${{ github.sha }}.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: treegen-${{ runner.os }}
+          name: treegen-${{ runner.os }}-${{ github.sha }}
           path: |
-            treegen-${{ runner.os }}.tar.gz
-            treegen-${{ runner.os }}.zip
+            treegen-${{ runner.os }}-${{ github.sha }}.tar.gz
+            treegen-${{ runner.os }}-${{ github.sha }}.zip
