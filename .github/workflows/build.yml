@@ -81,7 +81,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: treegen-${{ runner.os }}-${{ github.sha }}
+          name: treegen-${{ runner.os }}-${{ matrix.rust }}-${{ github.sha }}
           path: |
             treegen-*.tar.gz
             treegen-*.zip
