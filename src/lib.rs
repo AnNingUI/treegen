@@ -264,11 +264,14 @@ fn create_files_parallel(
 
     if dry_run {
         if verbose {
-            if batch_log > 1 {
-                eprintln!("[Dry-Run] Would create {total_files} files");
-            } else if batch_log == 1 {
-                for (path, _) in &files {
-                    eprintln!("[Dry-Run] Create file: {}", path.display());
+            match batch_log {
+                0..=1 => {
+                    for (path, _) in &files {
+                        eprintln!("[Dry-Run] Create file: {}", path.display());
+                    }
+                }
+                _ => {
+                    eprintln!("[Dry-Run] Would create {total_files} files");
                 }
             }
         }
