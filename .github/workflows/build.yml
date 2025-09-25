@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: treegen-${{ runner.os }}-${{ github.sha }}
